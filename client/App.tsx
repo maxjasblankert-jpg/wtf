@@ -7,7 +7,7 @@ import { BarbarianTrack } from './components/BarbarianTrack';
 import { ResourcesPanel } from './components/ResourcesPanel';
 import { ConstructionPanel } from './components/ConstructionPanel';
 import { ProgressCardsPanel } from './components/ProgressCardsPanel';
-import { useGameStore } from './store/gameStore';
+import { useGameStore, runBotStep } from './store/gameStore';
 import { useSocket } from './hooks/useSocket';
 import { Compass, Sparkles, Users, RotateCcw, AlertTriangle, Check, ShieldAlert, Trophy, Shield } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -17,17 +17,30 @@ import { GameSummary } from '../shared/statsTypes';
 import { getPastGames } from './services/firebaseService';
 
 const App: React.FC = () => {
-  const { gameState, lobbyPlayers, joinedRoomId, playerName, playerColor, isLobby, isConnected, playerId, localMode, startLocalGame } = useGameStore();
+  const { gameState, lobbyPlayers, joinedRoomId, playerName, playerColor, isLobby, isConnected, playerId, localMode, startLocalGame, localBots } = useGameStore();
   const { joinRoom, startGame, sendAction, stopGame } = useSocket();
 
-  const [inputRoomId, setInputRoomId] = useState('catan-ck');
-  const [inputName, setInputName] = useState('');
-  const [inputColor, setInputColor] = useState('red');
-  const [playMode, setPlayMode] = useState<'online' | 'local' | 'history'>('online');
+  const [inputRoomId, setInputRoomId] = useState(joinedRoomId && joinedRoomId !== 'local-game' ? joinedRoomId : 'catan-ck');
+  const [inputName, setInputName] = useState(playerName || '');
+  const [inputColor, setInputColor] = useState(playerColor || 'red');
+  const [playMode, setPlayMode] = useState<'online' | 'local' | 'history'>(localMode ? 'local' : 'online');
   const [localPlayerCount, setLocalPlayerCount] = useState<number>(3);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [selectedPastGame, setSelectedPastGame] = useState<GameSummary | null>(null);
   const [pastGames, setPastGames] = useState<GameSummary[]>([]);
+
+  // Trigger bot steps on reload/load for active bot turns in local play
+  React.useEffect(() => {
+    if (localMode && gameState) {
+      const currentActiveId = getActivePlayerId();
+      if (localBots && localBots.includes(currentActiveId)) {
+        const timer = setTimeout(() => {
+          runBotStep();
+        }, 800);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [localMode, gameState ? getActivePlayerId() : null, localBots]);
 
   React.useEffect(() => {
     if (playMode === 'history') {

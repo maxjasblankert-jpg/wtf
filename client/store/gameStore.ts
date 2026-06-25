@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { GameState } from '../../shared/types';
 import { createInitialState, processAction } from '../../server/gameEngine';
 import { getBotNextAction } from '../../shared/botRunner';
@@ -114,140 +115,157 @@ const initialSelection: SelectionState = {
   tempSelections: {}
 };
 
-export const useGameStore = create<GameStore>((set) => ({
-  gameState: null,
-  lobbyPlayers: [],
-  joinedRoomId: null,
-  playerId: null,
-  playerName: null,
-  playerColor: null,
-  isConnected: false,
-  isLobby: true,
+export const useGameStore = create<GameStore>()(
+  persist(
+    (set) => ({
+      gameState: null,
+      lobbyPlayers: [],
+      joinedRoomId: null,
+      playerId: null,
+      playerName: null,
+      playerColor: null,
+      isConnected: false,
+      isLobby: true,
 
-  localMode: false,
-  localBots: [],
+      localMode: false,
+      localBots: [],
 
-  selection: initialSelection,
+      selection: initialSelection,
 
-  showTradeModal: false,
-  setShowTradeModal: (showTradeModal) => set({ showTradeModal }),
+      showTradeModal: false,
+      setShowTradeModal: (showTradeModal) => set({ showTradeModal }),
 
-  setGameState: (gameState) => {
-    const prevState = useGameStore.getState().gameState;
-    const roomId = useGameStore.getState().joinedRoomId;
-    set({ gameState });
-    checkAndSaveStats(gameState, prevState, roomId);
-  },
-  setLobbyPlayers: (lobbyPlayers) => set({ lobbyPlayers }),
-  setRoomInfo: (joinedRoomId, playerName, playerColor, playerId) =>
-    set({ joinedRoomId, playerName, playerColor, playerId, isLobby: true }),
-  setConnected: (isConnected) => set({ isConnected }),
-  setLobbyStatus: (isLobby) => set({ isLobby }),
+      setGameState: (gameState) => {
+        const prevState = useGameStore.getState().gameState;
+        const roomId = useGameStore.getState().joinedRoomId;
+        set({ gameState });
+        checkAndSaveStats(gameState, prevState, roomId);
+      },
+      setLobbyPlayers: (lobbyPlayers) => set({ lobbyPlayers }),
+      setRoomInfo: (joinedRoomId, playerName, playerColor, playerId) =>
+        set({ joinedRoomId, playerName, playerColor, playerId, isLobby: true }),
+      setConnected: (isConnected) => set({ isConnected }),
+      setLobbyStatus: (isLobby) => set({ isLobby }),
 
-  setSelectionAction: (actionType, cardId = null) =>
-    set((state) => ({
-      selection: {
-        ...initialSelection,
-        actionType,
-        cardId
-      }
-    })),
+      setSelectionAction: (actionType, cardId = null) =>
+        set((state) => ({
+          selection: {
+            ...initialSelection,
+            actionType,
+            cardId
+          }
+        })),
 
-  selectVertex: (vertexId) =>
-    set((state) => ({
-      selection: {
-        ...state.selection,
-        vertexId
-      }
-    })),
+      selectVertex: (vertexId) =>
+        set((state) => ({
+          selection: {
+            ...state.selection,
+            vertexId
+          }
+        })),
 
-  selectEdge: (edgeId) =>
-    set((state) => ({
-      selection: {
-        ...state.selection,
-        edgeId
-      }
-    })),
+      selectEdge: (edgeId) =>
+        set((state) => ({
+          selection: {
+            ...state.selection,
+            edgeId
+          }
+        })),
 
-  selectHex: (hexId) =>
-    set((state) => ({
-      selection: {
-        ...state.selection,
-        hexId
-      }
-    })),
+      selectHex: (hexId) =>
+        set((state) => ({
+          selection: {
+            ...state.selection,
+            hexId
+          }
+        })),
 
-  clearSelection: () => set({ selection: initialSelection }),
+      clearSelection: () => set({ selection: initialSelection }),
 
-  setTempSelection: (key, value) =>
-    set((state) => ({
-      selection: {
-        ...state.selection,
-        tempSelections: {
-          ...state.selection.tempSelections,
-          [key]: value
+      setTempSelection: (key, value) =>
+        set((state) => ({
+          selection: {
+            ...state.selection,
+            tempSelections: {
+              ...state.selection.tempSelections,
+              [key]: value
+            }
+          }
+        })),
+
+      startLocalGame: (playerName, playerColor, playerCount) => {
+        // Determine colors not chosen by human
+        const botColors = ['blue', 'green', 'orange'].filter(c => c !== playerColor);
+        const botNames = ['Bob (Bot)', 'Charlie (Bot)', 'Dave (Bot)'];
+
+        const playersConfig = [
+          { id: 'player_human', name: playerName, color: playerColor }
+        ];
+
+        const localBots: string[] = [];
+        for (let i = 0; i < playerCount - 1; i++) {
+          const bId = `player_bot_${i + 1}`;
+          playersConfig.push({
+            id: bId,
+            name: botNames[i],
+            color: botColors[i]
+          });
+          localBots.push(bId);
+        }
+
+        const initialState = createInitialState(playersConfig, true);
+
+        set({
+          gameState: initialState,
+          playerId: 'player_human',
+          playerName,
+          playerColor,
+          joinedRoomId: 'local-game',
+          isLobby: false,
+          localMode: true,
+          localBots
+        });
+
+        // In setup phase, human acts first, so no bot runner trigger needed immediately.
+      },
+
+      applyLocalAction: (action, actPlayerId) => {
+        const state = useGameStore.getState();
+        if (!state.gameState) return;
+
+        try {
+          const prevState = state.gameState;
+          const nextState = processAction(prevState, action, actPlayerId);
+          set({ gameState: { ...nextState } });
+          checkAndSaveStats(nextState, prevState, state.joinedRoomId);
+
+          // Run bot steps if any bot has actions pending
+          setTimeout(() => {
+            runBotStep();
+          }, 700);
+        } catch (e: any) {
+          console.error('Local Action Error:', e.message);
+          if (actPlayerId === 'player_human') {
+            alert(`⚠️ Invalid Action: ${e.message}`);
+          }
         }
       }
-    })),
-
-  startLocalGame: (playerName, playerColor, playerCount) => {
-    // Determine colors not chosen by human
-    const botColors = ['blue', 'green', 'orange'].filter(c => c !== playerColor);
-    const botNames = ['Bob (Bot)', 'Charlie (Bot)', 'Dave (Bot)'];
-
-    const playersConfig = [
-      { id: 'player_human', name: playerName, color: playerColor }
-    ];
-
-    const localBots: string[] = [];
-    for (let i = 0; i < playerCount - 1; i++) {
-      const bId = `player_bot_${i + 1}`;
-      playersConfig.push({
-        id: bId,
-        name: botNames[i],
-        color: botColors[i]
-      });
-      localBots.push(bId);
+    }),
+    {
+      name: 'catan-game-storage',
+      partialize: (state) => ({
+        gameState: state.gameState,
+        joinedRoomId: state.joinedRoomId,
+        playerId: state.playerId,
+        playerName: state.playerName,
+        playerColor: state.playerColor,
+        isLobby: state.isLobby,
+        localMode: state.localMode,
+        localBots: state.localBots
+      })
     }
-
-    const initialState = createInitialState(playersConfig, true);
-
-    set({
-      gameState: initialState,
-      playerId: 'player_human',
-      playerName,
-      playerColor,
-      joinedRoomId: 'local-game',
-      isLobby: false,
-      localMode: true,
-      localBots
-    });
-
-    // In setup phase, human acts first, so no bot runner trigger needed immediately.
-  },
-
-  applyLocalAction: (action, actPlayerId) => {
-    const state = useGameStore.getState();
-    if (!state.gameState) return;
-
-    try {
-      const prevState = state.gameState;
-      const nextState = processAction(prevState, action, actPlayerId);
-      set({ gameState: { ...nextState } });
-      checkAndSaveStats(nextState, prevState, state.joinedRoomId);
-
-      // Run bot steps if any bot has actions pending
-      setTimeout(() => {
-        runBotStep();
-      }, 700);
-    } catch (e: any) {
-      console.error('Local Action Error:', e.message);
-      if (actPlayerId === 'player_human') {
-        alert(`⚠️ Invalid Action: ${e.message}`);
-      }
-    }
-  }
-}));
+  )
+);
 
 export function getActivePlayerId(state: GameState | null): string {
   if (!state) return '';
@@ -261,7 +279,7 @@ export function getActivePlayerId(state: GameState | null): string {
   return state.turnOrder[idx] || '';
 }
 
-function runBotStep() {
+export function runBotStep() {
   const store = useGameStore.getState();
   if (!store.localMode || !store.gameState || store.gameState.phase === 'end') return;
 
