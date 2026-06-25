@@ -1,0 +1,320 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-deep:         #1c1208;   /* page/app background */
+  --bg-panel:        #28180a;   /* panel backgrounds (sidebar, right panel) */
+  --bg-raised:       #352010;   /* elevated card/chip backgrounds */
+  --bg-inset:        #150e05;   /* inset wells, track backgrounds */
+  --border-dark:     #3d2810;   /* subtle panel borders */
+  --border-copper:   #8b5e2a;   /* accent borders, active states */
+  --border-gold:     #c49a3a;   /* bright accent, selected/hover */
+  --gold-primary:    #c8901e;   /* primary gold — headings, active labels */
+  --gold-bright:     #e8b030;   /* hover gold, highlighted numbers */
+  --gold-dim:        #7a5a1a;   /* disabled/inactive gold */
+  --text-primary:    #d4a96a;   /* main body text, labels */
+  --text-secondary:  #8a6a3a;   /* secondary labels, muted text */
+  --text-dim:         #5a4020;   /* disabled text */
+  --red-die:         #8b1a1a;   /* red die background */
+  --red-die-bright:  #c02020;   /* red die face pip color */
+  --yellow-die:      #8b7010;   /* yellow die background */
+  --green-track:     #1a4a2a;   /* Trade track color */
+  --green-track-lit: #2a7a40;   /* Trade track filled square */
+  --purple-track:    #2a1a4a;   /* Politics track color */
+  --purple-track-lit:#5a2a9a;   /* Politics track filled square */
+  --blue-track:      #1a2a4a;   /* Science track color */
+  --blue-track-lit:  #2a50a0;   /* Science track filled square */
+  --barbarian-red:   #6b1010;   /* barbarian tracker ship square */
+  --success:         #2a6a1a;
+  --danger:          #7a1a1a;
+
+  /* Player colors */
+  --player-red:      #c02020;
+  --player-blue:     #2050c0;
+  --player-green:    #20a030;
+  --player-orange:   #c06010;
+  --player-white:    #d0c8b8;
+}
+
+@layer base {
+  body {
+    font-family: 'IM Fell English', Georgia, serif;
+    background-color: var(--bg-deep);
+    color: var(--text-primary);
+    line-height: 1.65;
+  }
+  
+  h1, h2, h3, h4, h5, h6, .font-cinzel {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.08em;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-inset);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-copper);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-gold);
+}
+
+/* Global selection color */
+::selection {
+  background: var(--gold-dim);
+  color: var(--bg-deep);
+}
+
+/* Smooth transitions everywhere */
+* {
+  transition: border-color 0.15s, background-color 0.15s, opacity 0.15s;
+}
+
+/* Parchment Noise Overlay */
+.parchment-texture {
+  position: relative;
+}
+.parchment-texture::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+/* Panels */
+.glass-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.7), inset 0 1px 0 rgba(200,144,30,0.08);
+}
+.glass-panel-active {
+  border-color: var(--border-copper);
+}
+.glass-panel-hover {
+  transition: all 0.25s ease-in-out;
+}
+.glass-panel-hover:hover {
+  background: var(--bg-raised);
+  border-color: var(--border-gold);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.8), inset 0 1px 0 rgba(200,144,30,0.12);
+}
+
+/* Buttons */
+.custom-btn {
+  background: linear-gradient(180deg, #5a3010 0%, #2e1808 100%);
+  border: 1px solid var(--border-copper);
+  border-radius: 5px;
+  color: var(--gold-bright);
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+.custom-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #9d551c 0%, #723e14 100%);
+  border-color: var(--border-gold);
+}
+.custom-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Typography styles */
+.panel-heading {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-copper);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.player-name-topbar {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.resource-label {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.resource-count {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: var(--gold-bright);
+}
+
+.build-action-label {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.07em;
+  color: var(--text-primary);
+}
+
+.cost-text {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.dice-number {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--gold-bright);
+}
+
+.level-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+}
+
+/* Shaking animations for dice roll */
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(0px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(2px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(2px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+.animate-shake {
+  animation: shake 0.5s;
+  animation-iteration-count: 1;
+}
+
+/* Danger pulse for Barbarian Tracker */
+@keyframes dangerPulse {
+  0%, 100% { box-shadow: 0 0 4px #c03030; }
+  50% { box-shadow: 0 0 12px #ff4040; }
+}
+.animate-dangerPulse {
+  animation: dangerPulse 1s ease-in-out infinite;
+}
+
+/* Sidebars layout and internal scroll */
+.left-sidebar {
+  height: calc(100vh - 56px); /* subtract top bar height */
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+}
+
+.right-sidebar {
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+}
+
+/* Action Ledger scroll constraints */
+.action-ledger {
+  max-height: 120px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+/* Top bar score entries layout */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 56px;
+  flex-wrap: nowrap;
+}
+
+.player-scores {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: nowrap;
+  transition: gap 0.2s ease;
+}
+@media (max-width: 1024px) {
+  .player-scores {
+    gap: 12px;
+  }
+}
+
+.player-score-entry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* Unfilled (not yet reached) */
+.level-square {
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  border: 1px solid #3d2810;
+  background: #150e05;
+  color: #5a4020;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Filled (player has reached this level) */
+.level-square.reached {
+  border-color: currentColor;
+  color: white;
+}
+
+/* Per-track fill colours when reached */
+.science-track .level-square.reached  { background: #2a7a40; border-color: #2a7a40; }
+.trade-track   .level-square.reached  { background: #1d9e75; border-color: #1d9e75; }
+.politics-track .level-square.reached { background: #5a2a9a; border-color: #5a2a9a; }
+
+/* Level 3 — permanent ability unlocked — add star indicator */
+.level-square[data-level="3"].reached::after {
+  content: "★";
+  font-size: 7px;
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  opacity: 0.8;
+}
+
