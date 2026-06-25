@@ -59,6 +59,60 @@ function isConnectedToPlayerRoads(state: GameState, edge: Edge, playerId: string
   return false;
 }
 
+const DICE_PROBABILITIES: Record<number, number> = {
+  2: 1, 12: 1,
+  3: 2, 11: 2,
+  4: 3, 10: 3,
+  5: 4, 9: 4,
+  6: 5, 8: 5
+};
+
+function scoreVertex(state: GameState, vertex: Vertex): number {
+  let score = 0;
+  const uniqueTerrains = new Set<string>();
+
+  for (const hexId of vertex.adjacentHexIds) {
+    const hex = state.hexTiles.find(h => h.id === hexId);
+    if (hex && hex.terrain !== 'sea' && hex.terrain !== 'desert') {
+      const num = hex.number;
+      if (num && DICE_PROBABILITIES[num]) {
+        score += DICE_PROBABILITIES[num];
+      }
+      uniqueTerrains.add(hex.terrain);
+    }
+  }
+
+  score += uniqueTerrains.size;
+  return score;
+}
+
+function scoreRobberHex(state: GameState, hex: any, botPlayerId: string): number {
+  const num = hex.number || 0;
+  const pips = DICE_PROBABILITIES[num] || 0;
+  let score = pips;
+
+  const adjacentVertices = state.vertices.filter(v => v.adjacentHexIds.includes(hex.id));
+  let blocksSelf = false;
+  let opponentPipsBlocked = 0;
+
+  for (const v of adjacentVertices) {
+    if (v.building) {
+      if (v.building.playerId === botPlayerId) {
+        blocksSelf = true;
+      } else {
+        const multiplier = v.building.type === 'settlement' ? 2 : 4;
+        opponentPipsBlocked += pips * multiplier;
+      }
+    }
+  }
+
+  if (blocksSelf) {
+    score -= 100;
+  }
+  score += opponentPipsBlocked;
+  return score;
+}
+
 // MAIN BOT ACTION SELECTOR
 export function getBotNextAction(state: GameState, botPlayerId: string): any {
   const player = state.players.find(p => p.id === botPlayerId);
@@ -73,13 +127,14 @@ export function getBotNextAction(state: GameState, botPlayerId: string): any {
 
     if (round === 1) {
       if (playerBuildings.length === 0) {
-        // Build settlement: find first valid vertex satisfying distance rule
-        const validVertex = state.vertices.find(v => !v.building && isVertexDistanceRuleMet(state, v) && v.adjacentHexIds.some(hId => {
+        // Build settlement: find best valid vertex satisfying Catan yield scoring rules
+        const validVertices = state.vertices.filter(v => !v.building && isVertexDistanceRuleMet(state, v) && v.adjacentHexIds.some(hId => {
           const hex = state.hexTiles.find(h => h.id === hId)!;
           return hex.terrain !== 'sea';
         }));
-        if (validVertex) {
-          return { type: 'BUILD', buildType: 'settlement', targetId: validVertex.id };
+        if (validVertices.length > 0) {
+          validVertices.sort((a, b) => scoreVertex(state, b) - scoreVertex(state, a));
+          return { type: 'BUILD', buildType: 'settlement', targetId: validVertices[0].id };
         }
       } else if (playerRoads.length === 0) {
         // Build road adjacent to that settlement
@@ -92,13 +147,14 @@ export function getBotNextAction(state: GameState, botPlayerId: string): any {
     } else {
       // Round 2
       if (playerBuildings.length === 1) {
-        // Build starting city
-        const validVertex = state.vertices.find(v => !v.building && isVertexDistanceRuleMet(state, v) && v.adjacentHexIds.some(hId => {
+        // Build starting city: select high-yield spot
+        const validVertices = state.vertices.filter(v => !v.building && isVertexDistanceRuleMet(state, v) && v.adjacentHexIds.some(hId => {
           const hex = state.hexTiles.find(h => h.id === hId)!;
           return hex.terrain !== 'sea';
         }));
-        if (validVertex) {
-          return { type: 'BUILD', buildType: 'city', targetId: validVertex.id };
+        if (validVertices.length > 0) {
+          validVertices.sort((a, b) => scoreVertex(state, b) - scoreVertex(state, a));
+          return { type: 'BUILD', buildType: 'city', targetId: validVertices[0].id };
         }
       } else if (playerRoads.length === 1) {
         // Build road adjacent to that city
@@ -172,11 +228,11 @@ export function getBotNextAction(state: GameState, botPlayerId: string): any {
 
       // Robber moves
       if (state.pendingRobberMove) {
-        // Move robber to a random land hex (not desert, not current robber)
+        // Move robber to target the highest-yield opponent hex while avoiding self-block
         const validHexes = state.hexTiles.filter(h => h.terrain !== 'sea' && h.terrain !== 'desert' && !h.hasRobber);
         if (validHexes.length > 0) {
-          const targetHex = validHexes[Math.floor(Math.random() * validHexes.length)];
-          return { type: 'MOVE_ROBBER', hexId: targetHex.id };
+          validHexes.sort((a, b) => scoreRobberHex(state, b, botPlayerId) - scoreRobberHex(state, a, botPlayerId));
+          return { type: 'MOVE_ROBBER', hexId: validHexes[0].id };
         }
       }
 
@@ -217,10 +273,11 @@ export function getBotNextAction(state: GameState, botPlayerId: string): any {
       // 3. Build Settlement
       const builtSettlementsCount = playerSettlements.length;
       if (hasRes(player, { res: { lumber: 1, brick: 1, wool: 1, grain: 1 } }) && builtSettlementsCount < 5) {
-        // Find a vacant vertex connected to our roads that meets distance rules
-        const validVertex = state.vertices.find(v => !v.building && isVertexDistanceRuleMet(state, v) && isConnectedToRoad(state, v, botPlayerId));
-        if (validVertex) {
-          return { type: 'BUILD', buildType: 'settlement', targetId: validVertex.id };
+        // Find a vacant vertex connected to our roads that meets distance rules, sorted by strategic yield
+        const validVertices = state.vertices.filter(v => !v.building && isVertexDistanceRuleMet(state, v) && isConnectedToRoad(state, v, botPlayerId));
+        if (validVertices.length > 0) {
+          validVertices.sort((a, b) => scoreVertex(state, b) - scoreVertex(state, a));
+          return { type: 'BUILD', buildType: 'settlement', targetId: validVertices[0].id };
         }
       }
 
