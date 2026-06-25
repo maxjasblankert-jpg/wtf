@@ -263,7 +263,7 @@ const App: React.FC = () => {
           <div className="flex flex-col items-center justify-center text-center">
             {gameState.phase === 'setup' ? (
               <div className="flex flex-col items-center justify-center">
-                <span className="font-cinzel text-[15px] font-bold text-[var(--gold-primary)] tracking-widest uppercase">
+                <span className="font-cinzel text-xs font-bold text-[var(--gold-primary)] tracking-widest uppercase">
                   {getSetupInstruction()}
                 </span>
                 <span className="text-[9px] text-[var(--text-secondary)] font-serif mt-0.5 italic">
