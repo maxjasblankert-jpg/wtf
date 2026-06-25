@@ -240,21 +240,22 @@ def train_self_play(num_episodes=3, lr=0.001, gamma=0.99):
     win_records = {"p1": 0, "p2": 0, "p3": 0}
     
     for episode in range(1, num_episodes + 1):
-        print(f"\n--- Episode {episode}/{num_episodes} ---")
+        print(f"\n--- Episode {episode}/{num_episodes} ---", flush=True)
         
         # Reset game env
         try:
             obs, legal_actions, acting_player_id, done = env.reset()
         except Exception:
-            print("Aborting training. Bridge server connection failed.")
+            print("Aborting training. Bridge server connection failed.", flush=True)
             return
 
         # Setup trajectory memory per player
         # Trajectory stores: (rotated_obs_tensor, action_feats_tensor, chosen_idx, reward, log_prob)
         trajectories = {"p1": [], "p2": [], "p3": []}
         step_count = 0
+        max_steps_per_episode = 1000
         
-        while not done:
+        while not done and step_count < max_steps_per_episode:
             step_count += 1
             
             # Align observations to active player perspective
@@ -298,10 +299,13 @@ def train_self_play(num_episodes=3, lr=0.001, gamma=0.99):
             acting_player_id = next_acting_player_id
             
             if step_count % 100 == 0:
-                print(f"  Running steps: {step_count} | Standings: {player_vps}")
+                print(f"  Running steps: {step_count} | Standings: {player_vps}", flush=True)
                 
         # --- GAME OVER: Compute returns and perform Policy Updates ---
-        print(f"[OK] Episode {episode} Finished in {step_count} steps. Standings: {player_vps}")
+        if done:
+            print(f"[OK] Episode {episode} Finished in {step_count} steps. Standings: {player_vps}", flush=True)
+        else:
+            print(f"[TRUNCATED] Episode {episode} hit max step ceiling of {max_steps_per_episode} steps. Standings: {player_vps}", flush=True)
         
         # Track winners
         winner = max(player_vps, key=player_vps.get)
@@ -342,12 +346,12 @@ def train_self_play(num_episodes=3, lr=0.001, gamma=0.99):
             total_loss.backward()
             optimizer.step()
             
-            print(f"Loss: {total_loss.item():.4f}")
+            print(f"Loss: {total_loss.item():.4f}", flush=True)
         else:
-            print("  No policy updates (no VP changes occurred).")
+            print("  No policy updates (no VP changes occurred).", flush=True)
             
-    print("\n=== TRAINING CYCLE COMPLETE ===")
-    print(f"Final Win Records: {win_records}")
+    print("\n=== TRAINING CYCLE COMPLETE ===", flush=True)
+    print(f"Final Win Records: {win_records}", flush=True)
 
 if __name__ == "__main__":
     train_self_play(num_episodes=3)
