@@ -346,55 +346,108 @@ export const Board: React.FC = () => {
 
     const { scale } = getTransforms();
 
+    // Draw sea area radial gradient background
+    const radialGrad = ctx.createRadialGradient(
+      dimensions.width / 2,
+      dimensions.height / 2,
+      10,
+      dimensions.width / 2,
+      dimensions.height / 2,
+      Math.max(dimensions.width, dimensions.height) / 2
+    );
+    radialGrad.addColorStop(0, '#1A3A5C');
+    radialGrad.addColorStop(1, '#0D2035');
+    ctx.fillStyle = radialGrad;
+    ctx.fillRect(0, 0, dimensions.width, dimensions.height);
+
     // 1. Draw Sea and Land Hexes
     for (const hex of hexTiles) {
       const { x: cx, y: cy } = getHexCenter(hex);
       const canvasCenter = boardToCanvas(cx, cy);
 
       ctx.save();
-      ctx.beginPath();
-      // Draw pointy-topped hexagon path
-      for (let i = 0; i < 6; i++) {
-        const angle = (Math.PI / 180) * (60 * i - 30);
-        const vx = canvasCenter.x + S * scale * Math.cos(angle);
-        const vy = canvasCenter.y + S * scale * Math.sin(angle);
-        if (i === 0) ctx.moveTo(vx, vy);
-        else ctx.lineTo(vx, vy);
-      }
-      ctx.closePath();
+      const drawHexPath = (radiusVal: number) => {
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 180) * (60 * i - 30);
+          const vx = canvasCenter.x + radiusVal * Math.cos(angle);
+          const vy = canvasCenter.y + radiusVal * Math.sin(angle);
+          if (i === 0) ctx.moveTo(vx, vy);
+          else ctx.lineTo(vx, vy);
+        }
+        ctx.closePath();
+      };
+
+      drawHexPath(S * scale);
 
       // Hex terrain colors matching FIX 4 specs
       let fillStyle: any;
+      let innerBorderColor: string | null = null;
       if (hex.terrain === 'forest') {
-        fillStyle = '#1e5e1e';
-      } else if (hex.terrain === 'pasture') {
-        fillStyle = '#5aaa30';
-      } else if (hex.terrain === 'fields') {
-        fillStyle = '#d4a020';
+        fillStyle = '#2D6A2D';
+        innerBorderColor = '#1E471E';
       } else if (hex.terrain === 'hills') {
-        fillStyle = '#c44e20';
+        fillStyle = '#C0441A';
+        innerBorderColor = '#903313';
+      } else if (hex.terrain === 'pasture') {
+        fillStyle = '#7DB356';
+        innerBorderColor = '#5c873d';
+      } else if (hex.terrain === 'fields') {
+        fillStyle = '#D4A017';
+        innerBorderColor = '#a37a11';
       } else if (hex.terrain === 'mountains') {
-        fillStyle = '#7a7a8a';
+        fillStyle = '#5C687A';
+        innerBorderColor = '#464f5d';
       } else if (hex.terrain === 'desert') {
-        fillStyle = '#d4c090';
+        fillStyle = '#C8B882';
+        innerBorderColor = '#a89966';
       } else {
-        // Sea hexes: deep dark blue gradient
+        // Sea/Ocean tiles: deep navy, darker than current to frame the board better
         let gradient = ctx.createRadialGradient(canvasCenter.x, canvasCenter.y, 10, canvasCenter.x, canvasCenter.y, S * scale);
-        gradient.addColorStop(0, '#1a3a5a');
-        gradient.addColorStop(1, '#0d1f33');
+        gradient.addColorStop(0, '#1A3A5C');
+        gradient.addColorStop(1, '#0F2238');
         fillStyle = gradient;
       }
 
       ctx.fillStyle = fillStyle;
       ctx.fill();
 
+      // Draw subtle 1px inner border on each hex using a slightly darker shade
+      if (innerBorderColor) {
+        ctx.save();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = innerBorderColor;
+        drawHexPath(S * scale - 1.5);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Draw wood-grain texture overlay in Forest hexes
+      if (hex.terrain === 'forest') {
+        ctx.save();
+        drawHexPath(S * scale);
+        ctx.clip();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.lineWidth = 1 * scale;
+        const ox = canvasCenter.x - 30 * scale;
+        const oy = canvasCenter.y - 30 * scale;
+        for (let r = 25; r <= 120; r += 15) {
+          ctx.beginPath();
+          ctx.arc(ox, oy, r * scale, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
       // Border lines
       ctx.lineWidth = 1;
       if (hex.terrain === 'sea') {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        drawHexPath(S * scale);
         ctx.stroke();
       } else {
         ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+        drawHexPath(S * scale);
         ctx.stroke();
       }
 
@@ -404,6 +457,7 @@ export const Board: React.FC = () => {
       if (isHoveredHex || isSelectedHex) {
         ctx.lineWidth = 4;
         ctx.strokeStyle = '#6366f1';
+        drawHexPath(S * scale);
         ctx.stroke();
       }
 
@@ -412,35 +466,49 @@ export const Board: React.FC = () => {
       // Draw Number Tokens (only for land, excluding Desert)
       if (hex.terrain !== 'sea' && hex.terrain !== 'desert' && hex.number !== null) {
         ctx.save();
+        const tokenRadius = Math.max(14, 20 * scale);
+        
         ctx.beginPath();
-        ctx.arc(canvasCenter.x, canvasCenter.y, 16 * scale, 0, 2 * Math.PI);
-        ctx.fillStyle = '#f8f9fa';
-        ctx.shadowColor = 'rgba(0,0,0,0.5)';
-        ctx.shadowBlur = 8 * scale;
+        ctx.arc(canvasCenter.x, canvasCenter.y, tokenRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.shadowColor = 'rgba(0,0,0,0.6)';
+        ctx.shadowBlur = 4 * scale;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 2 * scale;
         ctx.fill();
 
-        ctx.strokeStyle = '#212529';
-        ctx.lineWidth = 1.5 * scale;
-        ctx.shadowBlur = 0; // reset shadow for stroke
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        ctx.strokeStyle = '#8B6914';
+        ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Draw Token Number text
-        ctx.fillStyle = (hex.number === 6 || hex.number === 8) ? '#e63946' : '#212529';
-        ctx.font = `bold ${16 * scale}px Outfit, Inter, sans-serif`;
+        let textColor = '#1A1A1A';
+        if (hex.number === 6 || hex.number === 8) {
+          textColor = '#CC0000';
+        } else if (hex.number === 5 || hex.number === 9) {
+          textColor = '#C05000';
+        }
+
+        const fontSize = Math.max(18, 22 * scale);
+        ctx.fillStyle = textColor;
+        ctx.font = `800 ${fontSize}px Outfit, Inter, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(hex.number.toString(), canvasCenter.x, canvasCenter.y - 2 * scale);
+        ctx.fillText(hex.number.toString(), canvasCenter.x, canvasCenter.y - 3 * scale);
 
-        // Pip dots (representing probability)
         const pipsCount: Record<number, number> = {
           2: 1, 12: 1, 3: 2, 11: 2, 4: 3, 10: 3, 5: 4, 9: 4, 6: 5, 8: 5
         };
         const pips = pipsCount[hex.number] || 0;
-        const pipRadius = 1.5 * scale;
-        const pipSpacing = 3 * scale;
-        const pipY = canvasCenter.y + 8 * scale;
+        const pipRadius = Math.max(1.5, 2 * scale);
+        const pipSpacing = Math.max(4, 6 * scale);
+        const pipY = canvasCenter.y + tokenRadius * 0.5;
 
-        ctx.fillStyle = (hex.number === 6 || hex.number === 8) ? '#e63946' : '#212529';
+        ctx.fillStyle = textColor;
         for (let p = 0; p < pips; p++) {
           const pipX = canvasCenter.x + (p - (pips - 1) / 2) * pipSpacing;
           ctx.beginPath();
@@ -593,42 +661,57 @@ export const Board: React.FC = () => {
       ctx.lineTo(posA.x, posA.y);
       ctx.moveTo(tokenPos.x, tokenPos.y);
       ctx.lineTo(posB.x, posB.y);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-      ctx.lineWidth = 1.2 * scale;
+      ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
+      ctx.lineWidth = Math.max(2, 2 * scale);
       ctx.stroke();
       ctx.restore();
 
-      // Rounded rectangle token
+      // Rounded rectangle token - dark badge in gold border
+      let ratioText = '3:1';
+      let emojiText = '❓';
+      if (type === '2:1_lumber') { ratioText = '2:1'; emojiText = '🪵'; }
+      else if (type === '2:1_brick') { ratioText = '2:1'; emojiText = '🧱'; }
+      else if (type === '2:1_wool') { ratioText = '2:1'; emojiText = '🐑'; }
+      else if (type === '2:1_grain') { ratioText = '2:1'; emojiText = '🌾'; }
+      else if (type === '2:1_ore') { ratioText = '2:1'; emojiText = '🪨'; }
+
       ctx.save();
-      const rw = 50 * scale;
-      const rh = 30 * scale;
+      const rw = Math.max(50, 60 * scale);
+      const rh = Math.max(24, 28 * scale);
 
-      let bgColor = '#4a2e12';
-      let rateText = '3:1';
-      if (type === '2:1_lumber') { bgColor = '#1e5e1e'; rateText = '2:1 🪵'; }
-      else if (type === '2:1_brick') { bgColor = '#c44e20'; rateText = '2:1 🧱'; }
-      else if (type === '2:1_wool') { bgColor = '#5aaa30'; rateText = '2:1 🐑'; }
-      else if (type === '2:1_grain') { bgColor = '#d4a020'; rateText = '2:1 🌾'; }
-      else if (type === '2:1_ore') { bgColor = '#7a7a8a'; rateText = '2:1 🪨'; }
-
-      ctx.fillStyle = bgColor;
+      ctx.fillStyle = 'rgba(15, 25, 45, 0.85)';
       ctx.beginPath();
       if (ctx.roundRect) {
-        ctx.roundRect(tokenPos.x - rw / 2, tokenPos.y - rh / 2, rw, rh, 4 * scale);
+        ctx.roundRect(tokenPos.x - rw / 2, tokenPos.y - rh / 2, rw, rh, 4);
       } else {
         ctx.rect(tokenPos.x - rw / 2, tokenPos.y - rh / 2, rw, rh);
       }
       ctx.fill();
 
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.lineWidth = 1 * scale;
+      // Border: 1px solid rgba(255,215,0,0.4)
+      ctx.strokeStyle = 'rgba(255, 215, 0, 0.4)';
+      ctx.lineWidth = 1;
       ctx.stroke();
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = `bold ${Math.max(12, 12 * scale)}px Outfit, Inter, sans-serif`;
-      ctx.textAlign = 'center';
+      // Center ratio and emoji
+      ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      ctx.fillText(rateText, tokenPos.x, tokenPos.y);
+      
+      ctx.font = '700 12px Outfit, Inter, sans-serif';
+      const ratioWidth = ctx.measureText(ratioText).width;
+      ctx.font = '14px Apple Color Emoji, Segoe UI Emoji, sans-serif';
+      const emojiWidth = ctx.measureText(emojiText).width;
+      
+      const totalWidth = ratioWidth + 4 + emojiWidth;
+      const startX = tokenPos.x - totalWidth / 2;
+
+      ctx.fillStyle = '#FFD700';
+      ctx.font = '700 12px Outfit, Inter, sans-serif';
+      ctx.fillText(ratioText, startX, tokenPos.y);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '14px Apple Color Emoji, Segoe UI Emoji, sans-serif';
+      ctx.fillText(emojiText, startX + ratioWidth + 4, tokenPos.y);
       ctx.restore();
     }
 
@@ -814,7 +897,13 @@ export const Board: React.FC = () => {
         height={dimensions.height}
         onMouseMove={handleMouseMove}
         onClick={handleCanvasClick}
-        className="cursor-crosshair transition-all duration-300 border-2 border-[var(--border-copper)] bg-[#0d1f33] rounded-[12px] shadow-inner max-w-full max-h-full"
+        style={{
+          border: '6px solid #5C3A1E',
+          boxShadow: '0 0 0 3px #8B6030, 0 8px 32px rgba(0,0,0,0.7)',
+          borderRadius: '12px',
+          background: 'radial-gradient(circle, #1A3A5C 0%, #0D2035 100%)'
+        }}
+        className="cursor-crosshair transition-all duration-300 max-w-full max-h-full"
       />
     </div>
   );

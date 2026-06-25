@@ -148,11 +148,7 @@ const App: React.FC = () => {
     const orderLen = gameState.turnOrder.length;
     const idx = gameState.currentPlayerIndex;
     const round = idx < orderLen ? 1 : 2;
-    if (round === 1) {
-      return "SETUP — Place your settlement, then a road";
-    } else {
-      return "SETUP — Place your city, then a road";
-    }
+    return round === 1 ? "Setup: Place Settlement & Road" : "Setup: Place City & Road";
   };
 
   const getSetupActivePlayerName = () => {
@@ -258,15 +254,16 @@ const App: React.FC = () => {
           }}
           className="top-bar z-40 relative animate-fade-in"
         >
-          
-          {/* 1. Turn indicator */}
+             {/* 1. Turn indicator */}
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full border border-black/45 shadow" style={{ backgroundColor: activePlayerColor }}></span>
-            <span className="font-cinzel text-xs font-bold text-[var(--text-primary)] uppercase">
-              {activePlayer?.name}'S TURN
-            </span>
+            <div className="active-player-pill flex items-center gap-2 px-3 py-1.5 rounded-full border border-[var(--border-gold)]/40 bg-[var(--bg-inset)]/65">
+              <span className="w-3 h-3 rounded-full border border-black/45 shadow" style={{ backgroundColor: activePlayerColor, boxShadow: `0 0 6px ${activePlayerColor}` }}></span>
+              <span className="font-cinzel text-xs font-bold text-[var(--text-primary)] uppercase leading-none">
+                {activePlayer?.name}'S TURN
+              </span>
+            </div>
             {isMyTurn && (
-              <span className="border border-[var(--border-copper)] text-[var(--gold-bright)] px-2 py-0.5 rounded-full text-[9px] font-bold font-cinzel tracking-widest bg-[var(--bg-inset)]/40 ml-1">
+              <span className="your-turn-pill border border-[#90EE90]/40 text-[#90EE90] px-3 py-1.5 rounded-full text-[11px] font-bold font-cinzel tracking-widest bg-[#2D5A1E] ml-1 leading-none">
                 YOUR TURN
               </span>
             )}
@@ -279,7 +276,7 @@ const App: React.FC = () => {
                 <span className="font-cinzel text-xs font-bold text-[var(--gold-primary)] tracking-widest uppercase">
                   {getSetupInstruction()}
                 </span>
-                <span className="text-[9px] text-[var(--text-secondary)] font-serif mt-0.5 italic">
+                <span className="text-[11px] text-[var(--text-secondary)] font-serif mt-0.5 italic">
                   Waiting for {getSetupActivePlayerName()}
                 </span>
               </div>
@@ -292,7 +289,7 @@ const App: React.FC = () => {
               </div>
             )}
           </div>
- 
+  
           {/* 3. VP Scores: Centered flex row (FIX 1) */}
           <div className="player-scores">
             {gameState.players.map((p, idx) => {
@@ -302,7 +299,7 @@ const App: React.FC = () => {
               const breakdown = getVpBreakdown(p);
               const nameText = p.name.replace(/\(bot\)/i, '').trim();
               const isBot = p.name.toLowerCase().includes('(bot)');
-
+ 
               return (
                 <div
                   key={p.id}
@@ -313,10 +310,11 @@ const App: React.FC = () => {
                   <div
                     style={{
                       backgroundColor: pColor,
-                      width: '10px',
-                      height: '10px',
+                      width: '12px',
+                      height: '12px',
                       borderRadius: '50%',
-                      border: '1px solid rgba(255,255,255,0.2)'
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      boxShadow: `0 0 6px ${pColor}`
                     }}
                   />
 

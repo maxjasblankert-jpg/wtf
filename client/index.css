@@ -24,7 +24,7 @@
   --purple-track:    #2a1a4a;   /* Politics track color */
   --purple-track-lit:#5a2a9a;   /* Politics track filled square */
   --blue-track:      #1a2a4a;   /* Science track color */
-  --blue-track-lit:  #2a50a0;   /* Science track filled square */
+  --blue-track-lit:  #00BFA5;   /* Science track filled square */
   --barbarian-red:   #6b1010;   /* barbarian tracker ship square */
   --success:         #2a6a1a;
   --danger:          #7a1a1a;
@@ -42,7 +42,7 @@
     font-family: 'IM Fell English', Georgia, serif;
     background-color: var(--bg-deep);
     color: var(--text-primary);
-    line-height: 1.65;
+    line-height: 1.45; /* Increased base line-height inside panels if currently below 1.4 to 1.45 */
   }
   
   h1, h2, h3, h4, h5, h6, .font-cinzel {
@@ -140,12 +140,13 @@
 .panel-heading {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--gold-primary);
+  letter-spacing: 0.15em;
+  color: #D4A017;
   text-transform: uppercase;
   border-bottom: 1px solid var(--border-copper);
   padding-bottom: 6px;
   margin-bottom: 10px;
+  font-size: 0.75rem;
 }
 
 .player-name-topbar {
@@ -304,8 +305,8 @@
 }
 
 /* Per-track fill colours when reached */
-.science-track .level-square.reached  { background: #2a7a40; border-color: #2a7a40; }
-.trade-track   .level-square.reached  { background: #1d9e75; border-color: #1d9e75; }
+.science-track .level-square.reached  { background: #00BFA5; border-color: #00BFA5; box-shadow: 0 0 8px rgba(0, 191, 165, 0.5); }
+.trade-track   .level-square.reached  { background: #2a7a40; border-color: #2a7a40; }
 .politics-track .level-square.reached { background: #5a2a9a; border-color: #5a2a9a; }
 
 /* Level 3 — permanent ability unlocked — add star indicator */
@@ -316,5 +317,73 @@
   top: 1px;
   right: 2px;
   opacity: 0.8;
+}
+
+/* Barbarian tracker style classes */
+.barbarian-track-active {
+  background: #c02020 !important;
+  border-color: #ff4040 !important;
+  box-shadow: 0 0 8px rgba(192, 32, 32, 0.8), inset 0 0 6px rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+.barbarian-track-inactive {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #A08060 !important;
+}
+
+/* Resource Card details */
+.resource-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+.resource-card:hover {
+  border-color: rgba(212, 160, 23, 0.4) !important;
+  box-shadow: inset 0 0 8px rgba(212, 160, 23, 0.2) !important;
+}
+
+.resource-card-count {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+/* Active Player indicators */
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: rgba(212, 160, 23, 0.4);
+    box-shadow: 0 0 4px rgba(212, 160, 23, 0.2);
+  }
+  50% {
+    border-color: rgba(212, 160, 23, 1.0);
+    box-shadow: 0 0 10px rgba(212, 160, 23, 0.6);
+  }
+}
+
+.active-player-pill {
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+.your-turn-pill {
+  background-color: #2D5A1E !important;
+  color: #90EE90 !important;
+}
+
+/* Safety font-size override: ensure no text is rendered below 11px anywhere in the UI */
+[class*="text-[7px]"],
+[class*="text-[8px]"],
+[class*="text-[9px]"],
+[class*="text-[10px]"] {
+  font-size: 11px !important;
+}
+.text-\[7px\],
+.text-\[8px\],
+.text-\[9px\],
+.text-\[10px\] {
+  font-size: 11px !important;
 }
 

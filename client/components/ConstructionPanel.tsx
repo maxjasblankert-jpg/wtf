@@ -158,7 +158,7 @@ export const ConstructionPanel: React.FC = () => {
       elements.push(
         <span key={res} className="inline-flex items-center gap-0.5">
           <span>{qty}</span>
-          <span style={{ fontSize: '15px' }} className="select-none leading-none">{emoji}</span>
+          <span style={{ fontSize: '16px' }} className="select-none leading-none">{emoji}</span>
         </span>
       );
     }
@@ -193,44 +193,48 @@ export const ConstructionPanel: React.FC = () => {
 
       {/* Building Actions Grid */}
       <div className="grid grid-cols-1 gap-1.5">
-        {buildButtons.map((btn) => {
+        {buildButtons.map((btn, idx) => {
           const isSelected = selection.actionType === btn.key;
           const hasEnough = hasResForAction(btn.key);
           const canAct = isMyTurn && (isSetup || (!isPreRoll && isBuilding)) && (hasEnough || isSetup);
 
-          let btnClass = "rounded flex flex-col items-start gap-0.5 text-left transition-all duration-150 select-none ";
+          let btnClass = "rounded flex flex-col items-start gap-0.5 text-left transition-all duration-150 select-none w-full ";
           if (isSelected) {
             btnClass += "border border-[var(--border-gold)] bg-gradient-to-b from-[#3a2212] to-[var(--bg-panel)] shadow-[0_0_8px_var(--gold-dim)]";
           } else {
             btnClass += "border border-[var(--border-dark)] bg-gradient-to-b from-[var(--bg-raised)] to-[var(--bg-panel)] hover:border-[var(--border-copper)] hover:from-[#3a2212] disabled:opacity-45 disabled:cursor-not-allowed disabled:hover:from-[var(--bg-raised)] disabled:hover:border-[var(--border-dark)]";
           }
 
-          return (
-            <button
-              key={btn.key}
-              onClick={() => setAction(btn.key)}
-              disabled={!canAct}
-              style={{ padding: '6px 8px' }}
-              className={btnClass}
-            >
-              <div className="flex justify-between items-center w-full">
-                {/* Build label: Cinzel 600, 0.68rem */}
-                <span className="build-action-label" style={{ fontSize: '0.68rem' }}>
-                  {btn.label}
-                </span>
-                <span className="text-xs leading-none select-none">{btn.structureIcon}</span>
-              </div>
-              
-              {/* Requires note: IM Fell English, 0.62rem, italic, color dim */}
-              {btn.requires && (
-                <span className="font-serif italic text-[0.62rem] text-[var(--text-dim)] -mt-0.5 leading-none">
-                  ({btn.requires})
-                </span>
-              )}
+          const isLast = idx === buildButtons.length - 1;
 
-              {/* Cost icons inline - FIX 8.3 */}
-              {renderCostIconsInline(btn.key)}
-            </button>
+          return (
+            <React.Fragment key={btn.key}>
+              <button
+                onClick={() => setAction(btn.key)}
+                disabled={!canAct}
+                style={{ padding: '6px 8px' }}
+                className={btnClass}
+              >
+                <div className="flex justify-between items-center w-full">
+                  {/* Build label: Cinzel 600, 0.7rem */}
+                  <span className="build-action-label" style={{ fontSize: '0.7rem' }}>
+                    {btn.label}
+                  </span>
+                  <span className="text-xs leading-none select-none">{btn.structureIcon}</span>
+                </div>
+                
+                {/* Requires note: IM Fell English, 0.7rem, italic, color dim */}
+                {btn.requires && (
+                  <span className="font-serif italic text-[0.7rem] text-[var(--text-dim)] -mt-0.5 leading-none">
+                    ({btn.requires})
+                  </span>
+                )}
+
+                {/* Cost icons inline - FIX 8.3 */}
+                {renderCostIconsInline(btn.key)}
+              </button>
+              {!isLast && <div className="border-b border-white/5 my-0.5 w-full" />}
+            </React.Fragment>
           );
         })}
       </div>
@@ -240,7 +244,7 @@ export const ConstructionPanel: React.FC = () => {
         
         {/* 2 for 1 Haven */}
         <div className="flex items-center justify-between gap-2 border-b border-[var(--border-dark)]/40 pb-2">
-          <span className="font-cinzel font-bold text-[9px] text-[var(--gold-primary)] uppercase tracking-wider leading-none whitespace-nowrap">
+          <span className="font-cinzel font-bold text-[11px] text-[var(--gold-primary)] uppercase tracking-wider leading-none whitespace-nowrap">
             2 FOR 1
           </span>
           <div className="flex justify-end items-center gap-1 flex-1">
@@ -271,7 +275,7 @@ export const ConstructionPanel: React.FC = () => {
                   >
                     {p.icon}
                   </div>
-                  <div className={`w-2.5 h-2.5 rounded flex items-center justify-center text-[7px] font-bold border ${active ? 'bg-[var(--success)] border-[var(--border-copper)] text-white' : 'bg-transparent border-[var(--border-dark)] text-transparent'}`}>
+                  <div className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[11px] font-bold border ${active ? 'bg-[var(--success)] border-[var(--border-copper)] text-white' : 'bg-transparent border-[var(--border-dark)] text-transparent'}`}>
                     ✓
                   </div>
                 </div>
@@ -282,7 +286,7 @@ export const ConstructionPanel: React.FC = () => {
 
         {/* 3 for 1 Haven */}
         <div className="flex items-center justify-between gap-2 border-b border-[var(--border-dark)]/40 pb-2">
-          <span className="font-cinzel font-bold text-[9px] text-[var(--gold-primary)] uppercase tracking-wider leading-none whitespace-nowrap">
+          <span className="font-cinzel font-bold text-[11px] text-[var(--gold-primary)] uppercase tracking-wider leading-none whitespace-nowrap">
             3 FOR 1
           </span>
           <div className="flex justify-end items-center gap-1 flex-1">
@@ -304,7 +308,7 @@ export const ConstructionPanel: React.FC = () => {
                 >
                   {icon}
                 </div>
-                <div className={`w-2.5 h-2.5 rounded flex items-center justify-center text-[7px] font-bold border ${has31Port ? 'bg-[var(--success)] border-[var(--border-copper)] text-white' : 'bg-transparent border-[var(--border-dark)] text-transparent'}`}>
+                <div className={`w-3.5 h-3.5 rounded flex items-center justify-center text-[11px] font-bold border ${has31Port ? 'bg-[var(--success)] border-[var(--border-copper)] text-white' : 'bg-transparent border-[var(--border-dark)] text-transparent'}`}>
                   ✓
                 </div>
               </div>
@@ -312,7 +316,7 @@ export const ConstructionPanel: React.FC = () => {
           </div>
         </div>
 
-        <p className="font-serif italic text-[0.65rem] text-[var(--text-dim)] text-center leading-none mt-0.5">
+        <p className="font-serif italic text-[0.7rem] text-[var(--text-dim)] text-center leading-none mt-0.5">
           You must build a settlement on a haven first
         </p>
 

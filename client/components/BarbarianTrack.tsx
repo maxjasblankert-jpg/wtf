@@ -15,10 +15,10 @@ export const BarbarianTrack: React.FC = () => {
   return (
     <div className="glass-panel p-3.5 rounded-lg border border-[var(--border-copper)] flex flex-col gap-3 w-full shadow-lg relative">
       <div className="flex items-center justify-between border-b border-[var(--border-copper)] pb-1.5 mb-1">
-        <h3 className="font-cinzel font-bold text-xs tracking-wider text-[var(--gold-primary)] uppercase">
+        <h3 className="panel-heading !mb-0 !pb-0 !border-0 text-xs">
           BARBARIAN TRACKER
         </h3>
-        <span className="text-[10px] text-[var(--text-secondary)] font-cinzel">
+        <span className="text-[11px] text-[var(--text-secondary)] font-cinzel">
           DEF: <span className="text-[var(--gold-bright)] font-bold">{gameState.knights.filter(k => k.isActive).reduce((sum, k) => sum + k.level, 0)}</span>
           &nbsp;|&nbsp;
           STR: <span className="text-red-400 font-bold">{gameState.vertices.filter(v => v.building && (v.building.type === 'city' || v.building.type === 'metropolis')).length}</span>
@@ -32,12 +32,12 @@ export const BarbarianTrack: React.FC = () => {
           const isFinalSpace = space === 1;
           const isOneAway = position === 2;
 
-          let squareClass = "w-[36px] h-[36px] rounded border display flex items-center justify-center transition-all duration-300 ";
+          let squareClass = "w-[36px] h-[36px] rounded border flex items-center justify-center transition-all duration-300 ";
           
           if (isShipHere) {
-            squareClass += "bg-[var(--barbarian-red)] border-[#c03030] text-white";
+            squareClass += "barbarian-track-active";
           } else {
-            squareClass += "bg-[var(--bg-inset)] border-[var(--border-dark)]";
+            squareClass += "barbarian-track-inactive";
           }
 
           if (isFinalSpace && isOneAway && !isShipHere) {
@@ -53,9 +53,9 @@ export const BarbarianTrack: React.FC = () => {
               {isShipHere ? (
                 <Ship className="w-5 h-5 text-white" />
               ) : isFinalSpace ? (
-                <Anchor className="w-5 h-5 text-[var(--text-secondary)]" />
+                <Anchor className="w-5 h-5 text-inherit" />
               ) : (
-                <span className="font-cinzel font-bold text-sm text-[var(--text-secondary)]">
+                <span className="font-cinzel font-bold text-sm text-inherit">
                   {space}
                 </span>
               )}

@@ -40,11 +40,11 @@ export const ResourcesPanel: React.FC = () => {
               <div
                 key={res.key}
                 style={{ padding: '6px 8px' }}
-                className="bg-[var(--bg-raised)] border border-[var(--border-dark)] rounded-md flex flex-col items-center gap-0.5 hover:border-[var(--border-copper)] transition-all duration-200"
+                className="resource-card flex flex-col items-center gap-0.5 transition-all duration-200"
               >
                 <span className="leading-none select-none" style={{ fontSize: '20px' }}>{res.icon}</span>
-                <span className="resource-label text-center leading-none" style={{ fontSize: '0.62rem' }}>{res.label}</span>
-                <span className="font-cinzel font-bold leading-none mt-0.5" style={{ fontSize: '1.3rem', color: qty > 0 ? 'var(--gold-bright)' : 'var(--text-dim)' }}>
+                <span className="resource-label text-center leading-none" style={{ fontSize: '0.7rem' }}>{res.label}</span>
+                <span className="resource-card-count leading-none mt-0.5" style={{ color: qty > 0 ? '#FFD700' : '#F5E6C8' }}>
                   {qty}
                 </span>
               </div>
@@ -60,11 +60,11 @@ export const ResourcesPanel: React.FC = () => {
               <div
                 key={res.key}
                 style={{ padding: '6px 8px' }}
-                className="bg-[var(--bg-raised)] border border-[var(--border-dark)] rounded-md flex flex-col items-center gap-0.5 hover:border-[var(--border-copper)] transition-all duration-200"
+                className="resource-card flex flex-col items-center gap-0.5 transition-all duration-200"
               >
                 <span className="leading-none select-none" style={{ fontSize: '20px' }}>{res.icon}</span>
-                <span className="resource-label text-center leading-none" style={{ fontSize: '0.62rem' }}>{res.label}</span>
-                <span className="font-cinzel font-bold leading-none mt-0.5" style={{ fontSize: '1.3rem', color: qty > 0 ? 'var(--gold-bright)' : 'var(--text-dim)' }}>
+                <span className="resource-label text-center leading-none" style={{ fontSize: '0.7rem' }}>{res.label}</span>
+                <span className="resource-card-count leading-none mt-0.5" style={{ color: qty > 0 ? '#FFD700' : '#F5E6C8' }}>
                   {qty}
                 </span>
               </div>
@@ -75,9 +75,9 @@ export const ResourcesPanel: React.FC = () => {
 
       {/* Commodities list with border-copper divider */}
       <div className="flex flex-col gap-1.5 border-t border-[var(--border-copper)] pt-2 mt-0.5">
-        <span className="resource-label text-center mb-0.5 uppercase text-[9px] font-bold" style={{ color: 'var(--gold-dim)' }}>
+        <h3 className="panel-heading text-center !border-0 !mb-1 !pb-0 text-[0.72rem]">
           COMMODITIES
-        </span>
+        </h3>
         <div className="grid grid-cols-3 gap-1.5">
           {commodityDefs.map((comm) => {
             const qty = player.commodities[comm.key];
@@ -85,11 +85,11 @@ export const ResourcesPanel: React.FC = () => {
               <div
                 key={comm.key}
                 style={{ padding: '6px 8px' }}
-                className="bg-[var(--bg-raised)] border border-[var(--border-dark)] rounded-md flex flex-col items-center gap-0.5 hover:border-[var(--border-gold)] transition-all duration-200"
+                className="resource-card flex flex-col items-center gap-0.5 transition-all duration-200"
               >
                 <span className="leading-none select-none" style={{ fontSize: '20px' }}>{comm.icon}</span>
-                <span className="resource-label text-center leading-none" style={{ fontSize: '0.62rem' }}>{comm.label}</span>
-                <span className="font-cinzel font-bold leading-none mt-0.5" style={{ fontSize: '1.3rem', color: qty > 0 ? 'var(--gold-bright)' : 'var(--text-dim)' }}>
+                <span className="resource-label text-center leading-none" style={{ fontSize: '0.7rem' }}>{comm.label}</span>
+                <span className="resource-card-count leading-none mt-0.5" style={{ color: qty > 0 ? '#FFD700' : '#F5E6C8' }}>
                   {qty}
                 </span>
               </div>

@@ -36,7 +36,7 @@ export const DicePanel: React.FC = () => {
     });
   };
 
-  // Render dots for dice fitting inside 44px
+  // Render dots for dice fitting inside 52px
   const renderDiceDots = (num: number, isRed: boolean) => {
     const dotsMap: Record<number, number[]> = {
       1: [4],
@@ -52,11 +52,11 @@ export const DicePanel: React.FC = () => {
     const dotBg = isRed ? 'bg-[var(--red-die-bright)]' : 'bg-slate-900';
 
     return (
-      <div className="grid grid-cols-3 grid-rows-3 gap-0.5 w-8 h-8 p-0.5 select-none pointer-events-none">
+      <div className="grid grid-cols-3 grid-rows-3 gap-1 w-10 h-10 p-0.5 select-none pointer-events-none">
         {Array.from({ length: 9 }).map((_, idx) => (
           <div key={idx} className="flex items-center justify-center">
             {dots.includes(idx) && (
-              <div className={`w-2 h-2 rounded-full ${dotBg} shadow-sm`} />
+              <div className={`w-2.5 h-2.5 rounded-full ${dotBg} shadow-sm`} />
             )}
           </div>
         ))}
@@ -64,7 +64,7 @@ export const DicePanel: React.FC = () => {
     );
   };
 
-  // Event die face details (white cube 44x44px) - FIX 10
+  // Event die face details (white cube 52x52px) - FIX 10
   const renderEventFace = () => {
     let symbol = '';
     let symbolColor = '#000000';
@@ -79,11 +79,11 @@ export const DicePanel: React.FC = () => {
           background: '#ffffff',
           border: '2px solid #cccccc',
           borderRadius: '6px',
-          width: '44px',
-          height: '44px',
-          boxShadow: 'inset 0 -2px 4px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.6)'
+          width: '52px',
+          height: '52px',
+          boxShadow: 'inset 0 -3px 6px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.8)'
         }}
-        className="flex items-center justify-center relative select-none font-bold text-xl"
+        className="flex items-center justify-center relative select-none font-bold text-2xl"
       >
         <span style={{ color: symbolColor }}>{symbol}</span>
       </div>
@@ -101,7 +101,7 @@ export const DicePanel: React.FC = () => {
     return (
       <span
         style={{ backgroundColor: bg }}
-        className="px-1.5 py-0.5 rounded-full text-white font-cinzel text-[7px] font-bold tracking-wider leading-none mt-1 select-none pointer-events-none"
+        className="px-1.5 py-0.5 rounded-full text-white font-cinzel text-[11px] font-bold tracking-wider leading-none mt-1 select-none pointer-events-none"
       >
         {text}
       </span>
@@ -134,10 +134,10 @@ export const DicePanel: React.FC = () => {
       {/* Alchemist Choice UI */}
       {gameState.alchemistPending && isMyTurn ? (
         <div className="flex flex-col items-center gap-3 w-full border border-[var(--border-copper)] bg-[var(--bg-inset)] p-3 rounded-lg">
-          <span className="text-[10px] text-[var(--gold-bright)] font-cinzel font-bold uppercase tracking-wider">Alchemist Selection</span>
+          <span className="text-[11px] text-[var(--gold-bright)] font-cinzel font-bold uppercase tracking-wider">Alchemist Selection</span>
           <div className="flex gap-4">
             <div className="flex flex-col items-center">
-              <label className="text-[9px] text-[var(--text-secondary)] font-cinzel mb-1">Yellow Die</label>
+              <label className="text-[11px] text-[var(--text-secondary)] font-cinzel mb-1">Yellow Die</label>
               <select
                 value={alcWhite}
                 onChange={(e) => setAlcWhite(parseInt(e.target.value))}
@@ -149,7 +149,7 @@ export const DicePanel: React.FC = () => {
               </select>
             </div>
             <div className="flex flex-col items-center">
-              <label className="text-[9px] text-[var(--text-secondary)] font-cinzel mb-1">Red Die</label>
+              <label className="text-[11px] text-[var(--text-secondary)] font-cinzel mb-1">Red Die</label>
               <select
                 value={alcRed}
                 onChange={(e) => setAlcRed(parseInt(e.target.value))}
@@ -182,9 +182,9 @@ export const DicePanel: React.FC = () => {
                     background: 'var(--yellow-die)',
                     border: '2px solid #c0a020',
                     borderRadius: '6px',
-                    width: '44px',
-                    height: '44px',
-                    boxShadow: 'inset 0 -2px 4px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.6)'
+                    width: '52px',
+                    height: '52px',
+                    boxShadow: 'inset 0 -3px 6px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.8)'
                   }}
                   className="flex items-center justify-center"
                 >
@@ -199,9 +199,9 @@ export const DicePanel: React.FC = () => {
                     background: 'var(--red-die)',
                     border: '2px solid #c04040',
                     borderRadius: '6px',
-                    width: '44px',
-                    height: '44px',
-                    boxShadow: 'inset 0 -2px 4px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.6)'
+                    width: '52px',
+                    height: '52px',
+                    boxShadow: 'inset 0 -3px 6px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.8)'
                   }}
                   className="flex items-center justify-center"
                 >
@@ -223,7 +223,7 @@ export const DicePanel: React.FC = () => {
             {/* Results Grid */}
             <div className="grid grid-cols-4 gap-1.5 text-center">
               <div className="flex flex-col gap-0.5">
-                <span className="text-[8px] font-cinzel text-[var(--text-secondary)] uppercase">Yellow</span>
+                <span className="text-[11px] font-cinzel text-[var(--text-secondary)] uppercase">Yellow</span>
                 <div
                   className="h-8 bg-[var(--bg-inset)] border border-[var(--border-dark)] rounded flex items-center justify-center font-cinzel font-bold text-[var(--gold-bright)]"
                   style={{ fontSize: '1.25rem' }}
@@ -233,7 +233,7 @@ export const DicePanel: React.FC = () => {
               </div>
 
               <div className="flex flex-col gap-0.5">
-                <span className="text-[8px] font-cinzel text-[var(--text-secondary)] uppercase">Red</span>
+                <span className="text-[11px] font-cinzel text-[var(--text-secondary)] uppercase">Red</span>
                 <div
                   className="h-8 bg-[var(--bg-inset)] border border-[var(--border-dark)] rounded flex items-center justify-center font-cinzel font-bold text-[var(--gold-bright)]"
                   style={{ fontSize: '1.25rem' }}
@@ -243,14 +243,14 @@ export const DicePanel: React.FC = () => {
               </div>
 
               <div className="flex flex-col gap-0.5">
-                <span className="text-[8px] font-cinzel text-[var(--text-secondary)] uppercase">Event</span>
+                <span className="text-[11px] font-cinzel text-[var(--text-secondary)] uppercase">Event</span>
                 <div className="h-8 bg-[var(--bg-inset)] border border-[var(--border-dark)] rounded flex items-center justify-center">
                   {getEventBadge(event)}
                 </div>
               </div>
 
               <div className="flex flex-col gap-0.5">
-                <span className="text-[8px] font-cinzel text-[var(--text-secondary)] uppercase">Total</span>
+                <span className="text-[11px] font-cinzel text-[var(--text-secondary)] uppercase">Total</span>
                 <div
                   className="h-8 bg-[var(--bg-inset)] border border-[var(--border-dark)] rounded flex items-center justify-center font-cinzel font-bold text-[var(--gold-bright)]"
                   style={{ fontSize: '1.25rem' }}
@@ -266,21 +266,24 @@ export const DicePanel: React.FC = () => {
                 <button
                   onClick={handleRoll}
                   disabled={isRolling}
-                  className="custom-btn text-[9px] py-1 px-0 text-center col-span-1 uppercase leading-none font-bold"
+                  style={{ height: '36px', letterSpacing: '0.08em' }}
+                  className="custom-btn text-[11px] px-0 text-center col-span-1 uppercase leading-none font-bold flex items-center justify-center"
                 >
                   Roll
                 </button>
                 <button
                   onClick={handleRoll}
                   disabled={isRolling}
-                  className="custom-btn text-[9px] py-1 px-0 text-center col-span-1 uppercase leading-none font-bold"
+                  style={{ height: '36px', letterSpacing: '0.08em' }}
+                  className="custom-btn text-[11px] px-0 text-center col-span-1 uppercase leading-none font-bold flex items-center justify-center"
                 >
                   Roll
                 </button>
                 <button
                   onClick={handleRoll}
                   disabled={isRolling}
-                  className="custom-btn text-[9px] py-1 px-0 text-center col-span-2 uppercase leading-none font-bold"
+                  style={{ height: '36px', letterSpacing: '0.08em' }}
+                  className="custom-btn text-[11px] px-0 text-center col-span-2 uppercase leading-none font-bold flex items-center justify-center"
                 >
                   Total: Roll
                 </button>
