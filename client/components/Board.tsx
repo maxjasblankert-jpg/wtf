@@ -512,7 +512,7 @@ export const Board: React.FC = () => {
         ctx.beginPath();
         ctx.moveTo(posA.x, posA.y);
         ctx.lineTo(posB.x, posB.y);
-        ctx.lineWidth = 7 * scale;
+        ctx.lineWidth = 13 * scale;
         ctx.strokeStyle = roadColor;
         ctx.lineCap = 'round';
         // Stroke shadow
@@ -522,7 +522,7 @@ export const Board: React.FC = () => {
 
         // Stroke dark borders
         ctx.shadowBlur = 0;
-        ctx.lineWidth = 1.5 * scale;
+        ctx.lineWidth = 2.5 * scale;
         ctx.strokeStyle = '#020617';
         ctx.stroke();
         ctx.restore();
@@ -532,7 +532,7 @@ export const Board: React.FC = () => {
         ctx.beginPath();
         ctx.moveTo(posA.x, posA.y);
         ctx.lineTo(posB.x, posB.y);
-        ctx.lineWidth = 6 * scale;
+        ctx.lineWidth = 11 * scale;
         ctx.strokeStyle = selection.actionType !== 'none' ? getPlayerColor(playerId) : 'rgba(255,255,255,0.4)';
         ctx.setLineDash([4, 4]);
         ctx.stroke();
@@ -645,84 +645,84 @@ export const Board: React.FC = () => {
 
         ctx.fillStyle = bColor;
         ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 1.5 * scale;
+        ctx.lineWidth = 2.5 * scale;
         ctx.shadowColor = 'rgba(0,0,0,0.5)';
         ctx.shadowBlur = 6 * scale;
 
         if (v.building.type === 'settlement') {
           // Draw small house shape
           ctx.beginPath();
-          ctx.moveTo(pos.x, pos.y - 8 * scale);
-          ctx.lineTo(pos.x + 8 * scale, pos.y - 2 * scale);
-          ctx.lineTo(pos.x + 8 * scale, pos.y + 7 * scale);
-          ctx.lineTo(pos.x - 8 * scale, pos.y + 7 * scale);
-          ctx.lineTo(pos.x - 8 * scale, pos.y - 2 * scale);
+          ctx.moveTo(pos.x, pos.y - 13 * scale);
+          ctx.lineTo(pos.x + 13 * scale, pos.y - 3 * scale);
+          ctx.lineTo(pos.x + 13 * scale, pos.y + 11 * scale);
+          ctx.lineTo(pos.x - 13 * scale, pos.y + 11 * scale);
+          ctx.lineTo(pos.x - 13 * scale, pos.y - 3 * scale);
           ctx.closePath();
           ctx.fill();
           ctx.stroke();
         } else if (v.building.type === 'city') {
           // Draw double-tower fortress shape
           ctx.beginPath();
-          ctx.moveTo(pos.x - 10 * scale, pos.y - 10 * scale);
-          ctx.lineTo(pos.x - 4 * scale, pos.y - 10 * scale);
-          ctx.lineTo(pos.x - 4 * scale, pos.y - 4 * scale);
-          ctx.lineTo(pos.x + 4 * scale, pos.y - 4 * scale);
-          ctx.lineTo(pos.x + 4 * scale, pos.y - 10 * scale);
-          ctx.lineTo(pos.x + 10 * scale, pos.y - 10 * scale);
-          ctx.lineTo(pos.x + 10 * scale, pos.y + 8 * scale);
-          ctx.lineTo(pos.x - 10 * scale, pos.y + 8 * scale);
+          ctx.moveTo(pos.x - 16 * scale, pos.y - 16 * scale);
+          ctx.lineTo(pos.x - 6 * scale, pos.y - 16 * scale);
+          ctx.lineTo(pos.x - 6 * scale, pos.y - 6 * scale);
+          ctx.lineTo(pos.x + 6 * scale, pos.y - 6 * scale);
+          ctx.lineTo(pos.x + 6 * scale, pos.y - 16 * scale);
+          ctx.lineTo(pos.x + 16 * scale, pos.y - 16 * scale);
+          ctx.lineTo(pos.x + 16 * scale, pos.y + 13 * scale);
+          ctx.lineTo(pos.x - 16 * scale, pos.y + 13 * scale);
           ctx.closePath();
           ctx.fill();
           ctx.stroke();
         } else if (v.building.type === 'metropolis') {
           // Metropolis: large castle shape with gold crown
           ctx.beginPath();
-          ctx.moveTo(pos.x - 12 * scale, pos.y - 12 * scale);
-          ctx.lineTo(pos.x - 6 * scale, pos.y - 12 * scale);
-          ctx.lineTo(pos.x - 6 * scale, pos.y - 6 * scale);
-          ctx.lineTo(pos.x + 6 * scale, pos.y - 6 * scale);
-          ctx.lineTo(pos.x + 6 * scale, pos.y - 12 * scale);
-          ctx.lineTo(pos.x + 12 * scale, pos.y - 12 * scale);
-          ctx.lineTo(pos.x + 12 * scale, pos.y + 10 * scale);
-          ctx.lineTo(pos.x - 12 * scale, pos.y + 10 * scale);
+          ctx.moveTo(pos.x - 20 * scale, pos.y - 20 * scale);
+          ctx.lineTo(pos.x - 10 * scale, pos.y - 20 * scale);
+          ctx.lineTo(pos.x - 10 * scale, pos.y - 10 * scale);
+          ctx.lineTo(pos.x + 10 * scale, pos.y - 10 * scale);
+          ctx.lineTo(pos.x + 10 * scale, pos.y - 20 * scale);
+          ctx.lineTo(pos.x + 20 * scale, pos.y - 20 * scale);
+          ctx.lineTo(pos.x + 20 * scale, pos.y + 16 * scale);
+          ctx.lineTo(pos.x - 20 * scale, pos.y + 16 * scale);
           ctx.closePath();
           ctx.fill();
           ctx.stroke();
 
           // Crown highlight border
           ctx.strokeStyle = '#c8922a'; // primary gold
-          ctx.lineWidth = 2 * scale;
+          ctx.lineWidth = 3.5 * scale;
           ctx.stroke();
 
           // Distinctive metropolis circle arch overlay badge (arch / M circle)
           ctx.save();
           ctx.beginPath();
-          ctx.arc(pos.x + 10 * scale, pos.y - 10 * scale, 8 * scale, 0, 2 * Math.PI);
+          ctx.arc(pos.x + 16 * scale, pos.y - 16 * scale, 12 * scale, 0, 2 * Math.PI);
           ctx.fillStyle = '#c8922a';
           ctx.fill();
           ctx.strokeStyle = '#e8b84b';
-          ctx.lineWidth = 1 * scale;
+          ctx.lineWidth = 1.5 * scale;
           ctx.stroke();
 
           ctx.fillStyle = '#1a1208';
-          ctx.font = `bold ${9 * scale}px Cinzel, serif`;
+          ctx.font = `bold ${13 * scale}px Cinzel, serif`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText('M', pos.x + 10 * scale, pos.y - 9 * scale);
+          ctx.fillText('M', pos.x + 16 * scale, pos.y - 15 * scale);
           ctx.restore();
         }
 
-        // Draw City Wall brick badge under building: small 8x8px badge in var(--border-copper)
+        // Draw City Wall brick badge under building: small 14x14px badge in var(--border-copper)
         if (v.building.hasWall) {
           ctx.save();
           ctx.fillStyle = '#8b5e2a'; // var(--border-copper)
           ctx.strokeStyle = '#3d2810'; // var(--border-dark)
-          ctx.lineWidth = 0.8 * scale;
+          ctx.lineWidth = 1.2 * scale;
           const bx = pos.x;
-          const by = pos.y + 10 * scale; // bottom-center of building
+          const by = pos.y + 14 * scale; // bottom-center of building
           ctx.beginPath();
-          // Draw small 8x8 square centered
-          ctx.rect(bx - 4 * scale, by - 4 * scale, 8 * scale, 8 * scale);
+          // Draw small 14x14 square centered
+          ctx.rect(bx - 7 * scale, by - 7 * scale, 14 * scale, 14 * scale);
           ctx.fill();
           ctx.stroke();
           ctx.restore();
@@ -754,8 +754,8 @@ export const Board: React.FC = () => {
 
         // Standing/lying flat capsule shape
         ctx.beginPath();
-        const kw = 8 * scale;
-        const kh = 14 * scale;
+        const kw = 12 * scale;
+        const kh = 20 * scale;
         if (ctx.roundRect) {
           ctx.roundRect(-kw, -kh, kw * 2, kh * 2, 5 * scale);
         } else {
@@ -765,12 +765,12 @@ export const Board: React.FC = () => {
         ctx.fill();
 
         ctx.strokeStyle = '#3d2810'; // var(--border-dark)
-        ctx.lineWidth = 1.5 * scale;
+        ctx.lineWidth = 2.5 * scale;
         ctx.stroke();
 
         // Print level text inside the knight
         ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${9 * scale}px Cinzel, serif`;
+        ctx.font = `bold ${13 * scale}px Cinzel, serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.shadowColor = '#000000';

@@ -134,7 +134,9 @@ export function getBotNextAction(state: GameState, botPlayerId: string): any {
         }));
         if (validVertices.length > 0) {
           validVertices.sort((a, b) => scoreVertex(state, b) - scoreVertex(state, a));
-          return { type: 'BUILD', buildType: 'settlement', targetId: validVertices[0].id };
+          const chosen = validVertices[0];
+          console.log(`[Bot Heuristics] Player ${botPlayerId} placing Setup Settlement on vertex ${chosen.id} (Score: ${scoreVertex(state, chosen)} pips/variety). Evaluated ${validVertices.length} options.`);
+          return { type: 'BUILD', buildType: 'settlement', targetId: chosen.id };
         }
       } else if (playerRoads.length === 0) {
         // Build road adjacent to that settlement
@@ -154,7 +156,9 @@ export function getBotNextAction(state: GameState, botPlayerId: string): any {
         }));
         if (validVertices.length > 0) {
           validVertices.sort((a, b) => scoreVertex(state, b) - scoreVertex(state, a));
-          return { type: 'BUILD', buildType: 'city', targetId: validVertices[0].id };
+          const chosen = validVertices[0];
+          console.log(`[Bot Heuristics] Player ${botPlayerId} placing Setup City on vertex ${chosen.id} (Score: ${scoreVertex(state, chosen)} pips/variety). Evaluated ${validVertices.length} options.`);
+          return { type: 'BUILD', buildType: 'city', targetId: chosen.id };
         }
       } else if (playerRoads.length === 1) {
         // Build road adjacent to that city
@@ -277,7 +281,9 @@ export function getBotNextAction(state: GameState, botPlayerId: string): any {
         const validVertices = state.vertices.filter(v => !v.building && isVertexDistanceRuleMet(state, v) && isConnectedToRoad(state, v, botPlayerId));
         if (validVertices.length > 0) {
           validVertices.sort((a, b) => scoreVertex(state, b) - scoreVertex(state, a));
-          return { type: 'BUILD', buildType: 'settlement', targetId: validVertices[0].id };
+          const chosen = validVertices[0];
+          console.log(`[Bot Heuristics] Player ${botPlayerId} expanding Settlement on vertex ${chosen.id} (Score: ${scoreVertex(state, chosen)} pips/variety). Evaluated ${validVertices.length} options.`);
+          return { type: 'BUILD', buildType: 'settlement', targetId: chosen.id };
         }
       }
 
