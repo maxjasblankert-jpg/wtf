@@ -29,6 +29,16 @@ const App: React.FC = () => {
   const [selectedPastGame, setSelectedPastGame] = useState<GameSummary | null>(null);
   const [pastGames, setPastGames] = useState<GameSummary[]>([]);
 
+  // Active turn player details
+  const getActivePlayerId = () => {
+    if (!gameState) return '';
+    let idx = gameState.currentPlayerIndex;
+    if (gameState.phase === 'setup' && idx >= gameState.turnOrder.length) {
+      idx = 2 * gameState.turnOrder.length - 1 - idx;
+    }
+    return gameState.turnOrder[idx] || '';
+  };
+
   // Trigger bot steps on reload/load for active bot turns in local play
   React.useEffect(() => {
     if (localMode && gameState) {
@@ -127,16 +137,6 @@ const App: React.FC = () => {
       </div>
     );
   }
-
-  // Active turn player details
-  const getActivePlayerId = () => {
-    if (!gameState) return '';
-    let idx = gameState.currentPlayerIndex;
-    if (gameState.phase === 'setup' && idx >= gameState.turnOrder.length) {
-      idx = 2 * gameState.turnOrder.length - 1 - idx;
-    }
-    return gameState.turnOrder[idx] || '';
-  };
 
   const activePlayerId = getActivePlayerId();
   const activePlayer = gameState ? gameState.players.find(p => p.id === activePlayerId) : null;
