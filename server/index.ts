@@ -49,7 +49,7 @@ io.on('connection', (socket: Socket) => {
   console.log(`User connected: ${socket.id}`);
 
   // 1. Join or Create Room
-  socket.on('JOIN_ROOM', ({ roomId, name, color }: { roomId: string; name: string; color: string }) => {
+  socket.on('JOIN_ROOM', ({ roomId, name, color, clientGameState }: { roomId: string; name: string; color: string; clientGameState?: GameState }) => {
     let room = rooms.get(roomId);
     if (!room) {
       room = {
@@ -59,6 +59,25 @@ io.on('connection', (socket: Socket) => {
         gameState: null
       };
       rooms.set(roomId, room);
+    }
+
+    // If room is not active but client provides a valid saved gameState, recover the game state!
+    if (!room.gameStarted && clientGameState && clientGameState.players) {
+      console.log(`Recovering game state for room ${roomId} from client ${name}`);
+      room.gameStarted = true;
+      room.gameState = clientGameState;
+      
+      // Re-populate room.players from the clientGameState players
+      room.players = clientGameState.players.map((p: any) => {
+        const existing = room!.players.find(rp => rp.name.toLowerCase() === p.name.toLowerCase());
+        return {
+          id: p.id,
+          name: p.name,
+          color: p.color,
+          socketId: existing ? existing.socketId : '',
+          connected: existing ? existing.connected : false
+        };
+      });
     }
 
     if (room.gameStarted) {

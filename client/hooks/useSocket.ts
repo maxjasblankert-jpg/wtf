@@ -37,8 +37,14 @@ export function useSocket() {
       setConnected(true);
 
       // Rejoin room if we have the info (for reconnects)
-      if (joinedRoomId && playerName && playerColor) {
-        socket?.emit('JOIN_ROOM', { roomId: joinedRoomId, name: playerName, color: playerColor });
+      if (joinedRoomId && joinedRoomId !== 'local-game' && playerName && playerColor) {
+        const localState = useGameStore.getState().gameState;
+        socket?.emit('JOIN_ROOM', { 
+          roomId: joinedRoomId, 
+          name: playerName, 
+          color: playerColor,
+          clientGameState: localState 
+        });
       }
     });
 
@@ -48,11 +54,13 @@ export function useSocket() {
     });
 
     socket.on('LOBBY_UPDATE', ({ players }: { players: any[] }) => {
+      if (useGameStore.getState().localMode) return;
       setLobbyPlayers(players);
       setLobbyStatus(true);
     });
 
     socket.on('STATE_UPDATE', ({ gameState }) => {
+      if (useGameStore.getState().localMode) return;
       setGameState(gameState);
       setLobbyStatus(false);
     });
