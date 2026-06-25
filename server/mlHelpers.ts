@@ -526,7 +526,33 @@ export function getLegalActions(state: GameState, playerId: string): any[] {
           isPlayable = true;
         }
       } else if (card.name === 'diplomat') {
-        const enemyRoad = state.edges.find(e => e.road && e.road.playerId !== playerId);
+        const enemyRoad = state.edges.find(e => {
+          if (!e.road || e.road.playerId === playerId) return false;
+          const roadOwnerId = e.road.playerId;
+          let isConnectA = false;
+          let isConnectB = false;
+
+          const [vA, vB] = e.adjacentVertexIds;
+          const vNodeA = state.vertices.find(v => v.id === vA)!;
+          const vNodeB = state.vertices.find(v => v.id === vB)!;
+
+          if (vNodeA.building && vNodeA.building.playerId === roadOwnerId) isConnectA = true;
+          if (vNodeB.building && vNodeB.building.playerId === roadOwnerId) isConnectB = true;
+
+          for (const eId of vNodeA.adjacentEdgeIds) {
+            if (eId === e.id) continue;
+            const eNode = state.edges.find(ed => ed.id === eId)!;
+            if (eNode.road && eNode.road.playerId === roadOwnerId) isConnectA = true;
+          }
+          for (const eId of vNodeB.adjacentEdgeIds) {
+            if (eId === e.id) continue;
+            const eNode = state.edges.find(ed => ed.id === eId)!;
+            if (eNode.road && eNode.road.playerId === roadOwnerId) isConnectB = true;
+          }
+
+          return !(isConnectA && isConnectB);
+        });
+
         if (enemyRoad) {
           params = { edgeId: enemyRoad.id };
           isPlayable = true;
